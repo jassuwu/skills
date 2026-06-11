@@ -1,0 +1,22 @@
+{
+  "watches": [
+    {
+      "id": "dhurandhar2",
+      "movie": "Dhurandhar 2",
+      "regionCode": "CHEN",
+      "city": "chennai",
+      "formats": ["2D", "IMAX 2D"],
+      "language": "Hindi",
+      "seatFilter": "optimal",
+      "theatres": [
+        { "venueCode": "PVTJ", "name": "PVR: Theyagaraja, Thiruvanmiyur, Chennai" },
+        { "venueCode": "GRTC", "name": "GanapathyRam Theatre 4K Dolby 7.1: Chennai" },
+        { "venueCode": "CBMC", "name": "Cinepolis: BSR Mall, OMR, Thoraipakkam" },
+        { "venueCode": "INPR", "name": "INOX: LUXE Phoenix Market City, Velachery" },
+        { "venueCode": "PGMV", "name": "PVR: Grand Mall, Velachery" },
+        { "venueCode": "PVHR", "name": "PVR: Heritage RSL ECR, Chennai" },
+        { "venueCode": "PVPZ", "name": "PVR: Palazzo, The Nexus Vijaya Mall" }
+      ]
+    }
+  ]
+}
