@@ -2,9 +2,9 @@
 
 Each artifact is one self-contained `.html` file — inline CSS, no external requests, works offline, shareable as a single file. It should read like a top-tier interactive blog post (think samwho.dev), **not** a Markdown dump in a `<body>`. The bar: someone too fed up to read an ugly plan will *want* to read this one.
 
-Two jobs, equally important:
-1. **Look typeset** — serif display over humanist-sans body, one calm column, real dark mode. (Design system, below.)
-2. **Make ideas move** — the reason this earns HTML over Markdown is interaction: diagrams that draw themselves, sims you can drive, mock UIs, before/after toggles. (Explorable playbook, below.)
+Two jobs:
+1. **Look typeset** — serif display over humanist-sans body, one calm column, real dark mode. (Design system, below.) Non-negotiable on every post.
+2. **Make ideas move — only when it helps.** Interaction is what *can* earn HTML over Markdown, but most replies are mostly prose. Reach for a diagram or a live widget when it conveys something words can't; otherwise leave it out. A decorative visual is worse than none. (Explorable playbook, below.)
 
 The server injects the live-reload script and a "← reading list" back-link, so **don't** add navigation chrome yourself.
 
@@ -105,7 +105,7 @@ pre code{font:inherit;color:inherit}
 .callout.warn .label{color:var(--warn)}.callout :last-child{margin-bottom:0}
 blockquote{margin:1.6rem 0;padding-left:1.1rem;border-left:3px solid var(--accent);font:italic 1.2rem/1.5 var(--display);color:var(--fg-strong)}
 /* figures */
-figure{margin:2rem 0}figure svg,figure canvas{display:block;max-width:100%;margin-inline:auto}
+figure{margin:2rem 0}figure svg,figure canvas{display:block;width:100%;height:auto;margin-inline:auto}
 figcaption{font:.9375rem/1.5 var(--body);color:var(--muted);text-align:center;margin-top:.7rem}
 figcaption::before{content:"Fig · ";color:var(--faint);font:.8125rem var(--mono)}
 /* tables */
@@ -160,7 +160,7 @@ document.querySelectorAll('figure.code .copy').forEach(b=>b.addEventListener('cl
 
 - **Callout:** `<div class="callout"><div class="label">Note</div><p>…</p></div>` — add `warn` for the red variant. Use a bare `<blockquote>` for a punchy thesis line (no box).
 - **Code with chrome:** `<figure class="code"><div class="code-bar">server.py<button class="copy">copy</button></div><pre><code>…</code></pre></figure>`. Hand-tag syntax with `<span class="k/s/n/c/f">` only if it helps; an untagged block still looks right. Add `bleed` for wide code.
-- **Figure:** `<figure class="bleed"><svg>…</svg><figcaption>What it shows.</figcaption></figure>`.
+- **Figure:** `<figure class="bleed"><svg style="width:100%;height:auto">…</svg><figcaption>What it shows.</figcaption></figure>`. Style the SVG via an inner `<style>` or `style=` — never `fill=`/`stroke=` attributes (`var()` won't resolve there). See "Styling SVG" below.
 - **Sidenote:** `<span class="sn">A margin aside.</span>` right after the word it annotates.
 - **Table:** wrap in `<div class="tw"><table>…</table></div>`.
 
@@ -168,7 +168,9 @@ document.querySelectorAll('figure.code .copy').forEach(b=>b.addEventListener('cl
 
 ## Make it move — the explorable playbook
 
-The medium justifying itself. Substantial posts should carry at least one live visual; great ones compose 3–5 on an interest curve (no-prereq hook → one mechanic at a time → finale that reuses them).
+The medium justifying itself — *when it earns it*. **Most posts need zero or one visual.** Reach for one only when it conveys something prose can't: timing, flow, a tradeoff curve, a structure. Never add a visual to decorate or to look rich — if you can't name what it teaches, cut it. A plan or a review usually wants exactly one thing (a dependency flow; the diff), not a gallery; only a genuine tutorial earns several, and even then each must pull its weight.
+
+> **Styling SVG (critical).** `var()` does NOT resolve inside SVG *presentation attributes* — `fill="var(--x)"`, `stroke="…"`, `font-family="…"` silently fall back to black / default serif (this is the #1 way htmlize diagrams break). Style SVG only through CSS: a `<style>` block *inside* the `<svg>` (the page's custom properties cascade in), or `style="fill:var(--x)"` on elements. And give every diagram `<svg>` an explicit `style="width:100%;height:auto"` — a bare `viewBox` with no width renders tiny and off-center.
 
 **Philosophy**
 - **Show the thing moving.** If the lesson is timing, throughput, backpressure, emergence, or "small change → big change," static can't carry it — animate the *mechanism*, not decoration. If you can't name the variable a motion represents, cut it.
@@ -287,13 +289,15 @@ The details that make it instantly read as high-taste:
 2. **One ink accent + one warning red, disciplined** — links, focus rings, the `→`/`←` motif, bullets. The `--d-*` palette is quarantined to viz.
 3. **Code as a physical slab** — dark in both themes, soft shadow, no hard border, filename chrome, hover-reveal copy.
 4. **Margin sidenotes** that float into the gutter on wide screens.
-5. **A live, self-running explorable** as the centerpiece.
+5. **A live explorable when the topic genuinely earns it** — as the centerpiece, never as filler.
 
 ## Anti-patterns
 
 - **No Inter/Geist/Roboto + indigo-gradient hero.** That combo *is* the AI-generic look. Serif/humanist-sans system pairing only.
 - **No bold-sans headlines, no centered long body text, no full-width prose sprawl.** Left-aligned ~68ch; only figures/explorables `bleed`.
 - **No ASCII/box-drawing diagrams** — SVG (A1/A3); it's not more code and it actually reflows.
+- **No `var()` in SVG presentation attributes** (`fill=`/`stroke=`/`font-family=`) — it renders black/default. Style SVG via `<style>`/`style=`, and give diagram SVGs `style="width:100%;height:auto"`.
+- **No visual-for-the-sake-of-it.** One purposeful visual beats three decorative ones; a review needs the diff, not a gallery. No fake mock-UI panels that illustrate nothing. When in doubt, prose.
 - **No charting libraries or CDNs** — hand-roll canvas/SVG; the file must work offline.
 - **No decorative/unpausable motion** — if you can't name the variable it encodes, cut it; every loop >5s needs Step/Pause/Reset; default sims to manual Step under reduced-motion.
 - **No content trapped at `opacity:0`** — apply hidden state only via JS; reveal immediately under reduced-motion / no-JS.
