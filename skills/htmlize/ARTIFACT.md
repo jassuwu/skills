@@ -1,6 +1,6 @@
 # HTML Artifact Format
 
-Each artifact is one self-contained `.html` file: inline CSS, no external requests, a real `<title>` (the index uses it as the label). It must read well and be trivial to share — the user can send the file and it just opens, offline. Static, so any interactive widgets keep their state.
+Each artifact is one self-contained `.html` file: inline CSS, no external requests, a real `<title>` (the server's index uses it as the label). It must read well and be trivial to share — the user can send the file and it just opens, offline. Nothing reloads while it sits there, so interactive widgets keep their state.
 
 ## Scaffold
 
@@ -29,7 +29,7 @@ The format earns its place by carrying what Markdown can't. Use it.
 - **Tables** for tabular data. **`<details>`** to fold long code or secondary detail. Tabs when comparing variants.
 - **Code review** — render the diff with inline margin annotations; colour-code findings by severity.
 - **Exploration** — lay 3–6 options in `.grid`, each labelled with the tradeoff it makes.
-- **Tuning (animation, colour, params)** — build a throwaway editor: live preview plus sliders or knobs, and always a "copy as prompt / JSON" button that turns the user's tweaks back into something they can paste back. These live widgets are why artifacts are static rather than auto-refreshing.
+- **Tuning (animation, colour, params)** — build a throwaway editor: live preview plus sliders or knobs, and always a "copy as prompt / JSON" button that turns the user's tweaks back into something they can paste back. The view only reloads when the agent writes or edits a file, so while you're dragging a slider nothing resets under you.
 
 ## Style
 

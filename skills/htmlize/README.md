@@ -2,41 +2,34 @@
 
 A single Claude Code skill. Type `/htmlize` and substantial replies — plans, reviews, specs,
 explainers — render as polished, self-contained HTML in a live browser tab instead of walls of
-terminal Markdown. New replies appear on their own.
+terminal Markdown. The view updates in place as new replies land — no refresh tick, no new tabs.
 
-Needs only a **POSIX shell and a browser** — no Python, no Node, no install. (Python isn't a
-safe default: macOS dropped the bundled runtime in 12.3, Windows ships none, and Claude Code's
-native binary means Node isn't guaranteed either.)
+Needs **`python3`** (stdlib only) and a browser. The server binds to `127.0.0.1`.
 
 ## Structure
 
 ```
 skills/htmlize/
-├── SKILL.md          # the skill: when on, behaviour, the toggle (≈40 lines)
+├── SKILL.md          # the skill: when on, behaviour, the on/off toggle
 ├── ARTIFACT.md       # how each HTML artifact should look + read
 └── scripts/
-    ├── mkindex.sh    # 10-line POSIX-sh index generator (deterministic, bundled)
-    └── serve.py      # optional live-reload server for a zero-click variant
+    └── serve.py      # the live-reload server (stdlib, binds 127.0.0.1)
 ```
 
 ## Install
 
+Via [skills.sh](https://skills.sh):
+
 ```bash
-mkdir -p ~/.claude/skills && cp -r skills/htmlize ~/.claude/skills/   # all projects
-# or this project only:
-mkdir -p .claude/skills && cp -r skills/htmlize .claude/skills/
+bunx --bun skills add jassuwu/skills -s htmlize
 ```
 
 ## Use
 
-- `/htmlize on` — start the view, switch to HTML output (opens a tab)
-- `/htmlize off` — back to normal terminal replies
+- `/htmlize on` — start the server and open the live view tab
+- `/htmlize off` — stop the server, back to normal terminal replies
 - `/htmlize` — toggle
 
-Artifacts land in `.claude-html/NNNN-slug.html` (static — flicker-free, widgets keep state);
-`index.html` lists them and refreshes every ~2s. Worth `.gitignore`-ing `.claude-html/`.
-
-## Default vs the optional server
-
-Default (shell only): a new reply shows up atop the auto-refreshing index — one click to read.
-`scripts/serve.py` (needs Python or Node): content appears in place, no clicks, no refresh tick.
+Artifacts land in `.claude-html/NNNN-slug.html` (static, self-contained files the server lists by
+their `<title>`). The server live-reloads the open tab over SSE whenever one is added or edited, so
+a new reply appears with no click and no flicker. Worth `.gitignore`-ing `.claude-html/`.

@@ -6,8 +6,8 @@ anything in it changes. Binds to 127.0.0.1 only.
 
   python3 serve.py [--dir .claude-html] [--port 7878] [--no-open]
 
-This exact file is also embedded inside SKILL.md as a fallback, so the skill
-works even if this sibling file is missing. Keep the two copies in sync.
+This is the only view for the skill: the agent copies it to .claude-html/.serve.py
+and runs that. Stdlib only, so it runs anywhere python3 does.
 """
 import argparse, hashlib, http.server, mimetypes, os, posixpath
 import socketserver, sys, threading, time, urllib.parse, webbrowser
@@ -64,6 +64,24 @@ def watch():
             last = cur; V += 1
 
 
+def esc(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def title_of(fp, fallback):
+    try:
+        s = open(fp, "r", encoding="utf-8", errors="replace").read(8192)
+    except OSError:
+        return fallback
+    lo = s.lower()
+    i = lo.find("<title>")
+    if i == -1:
+        return fallback
+    j = lo.find("</title>", i)
+    t = s[i + 7:j].strip() if j != -1 else ""
+    return t or fallback
+
+
 def index():
     rows = []
     try:
@@ -71,8 +89,9 @@ def index():
         fs.sort(key=lambda n: os.stat(os.path.join(D, n)).st_mtime, reverse=True)
         for n in fs:
             t = time.strftime("%b %d, %H:%M", time.localtime(os.stat(os.path.join(D, n)).st_mtime))
+            label = esc(title_of(os.path.join(D, n), n))
             rows.append('<a class="row" href="./%s"><b>%s</b><span class="when">%s</span></a>'
-                        % (urllib.parse.quote(n), n, t))
+                        % (urllib.parse.quote(n), label, t))
     except OSError:
         pass
     body = "".join(rows) if rows else (

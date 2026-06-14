@@ -39,7 +39,7 @@ installs via [skills.sh](https://skills.sh) — works with Claude Code, Cursor, 
 
 | skill | what it teaches the agent |
 |---|---|
-| [`htmlize`](./skills/htmlize) | render substantial replies — plans, reviews, specs, explainers — as polished, self-contained HTML in a live browser tab instead of walls of terminal Markdown. needs only a POSIX shell and a browser; no Python, no Node, no install. `/htmlize on` to start, `/htmlize off` to stop, bare `/htmlize` to toggle |
+| [`htmlize`](./skills/htmlize) | render substantial replies — plans, reviews, specs, explainers — as polished, self-contained HTML in a live browser tab that updates in place, instead of walls of terminal Markdown. needs `python3` and a browser. `/htmlize on` to start, `/htmlize off` to stop, bare `/htmlize` to toggle |
 
 ## anatomy
 
@@ -50,10 +50,9 @@ skills/
 └── htmlize/
     ├── SKILL.md          # when it's on, the behaviour, the on/off toggle
     ├── ARTIFACT.md       # how each HTML artifact should look + read
-    ├── README.md         # the skill, in depth (default shell view vs optional server)
+    ├── README.md         # the skill, in depth
     └── scripts/
-        ├── mkindex.sh    # 10-line POSIX-sh index generator (deterministic, bundled)
-        └── serve.py      # optional live-reload server for a zero-click variant
+        └── serve.py      # live-reload server (python3, stdlib, binds 127.0.0.1)
 ```
 
 ## license
