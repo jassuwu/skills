@@ -26,7 +26,7 @@ Stop the server (`kill "$(cat .htmlize/.serve.pid 2>/dev/null)" 2>/dev/null`; re
 
 A substantial reply — plan, spec, code review, PR writeup, architecture overview, research summary, explainer, comparison, runbook — does not go in the terminal. Write it to `.htmlize/NNNN-slug.html` (zero-padded; next number from `ls .htmlize/*.html`). The server detects the new file and reloads the open tab — no extra step. Reply in at most two lines: what it is and the path. New topic → new file. Iterating on the same thing → edit that file.
 
-Each artifact must set three `<head>` tags — `<title>`, `<meta name=description>` (one-line summary), and `<meta name=htmlize-type>` (one of: plan, review, spec, explainer, comparison, research, runbook, design, note) — because the index is a **reading list** built from them. Then build it per [ARTIFACT.md](ARTIFACT.md): a typeset, self-contained post that reaches for the right visual or live explorable, not a Markdown dump in a `<body>`. That craft is the point.
+Each artifact must set three `<head>` tags — `<title>`, `<meta name=description>` (one-line summary), and `<meta name=htmlize-type>` (one of: plan, review, spec, explainer, comparison, research, runbook, design, note) — because the index is a **reading list** built from them. Then build it per [ARTIFACT.md](ARTIFACT.md): a clear, readable, self-contained post that uses a visual only where it genuinely helps the reader understand — not a Markdown dump in a `<body>`.
 
 A trivial reply — a quick fact, a clarifying question, a status line, a confirmation — goes in the terminal as usual. Don't wrap one sentence in a web page.
 

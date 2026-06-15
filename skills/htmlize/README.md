@@ -37,9 +37,9 @@ and filter — all of which persist to `.htmlize/.state.json`. The server live-r
 open tab over SSE as posts are added or edited (no flicker, no new tabs) and injects a "← reading
 list" link into each post. Worth `.gitignore`-ing `.htmlize/`.
 
-Each post is a self-contained file — email it and it just opens, offline. The look (serif display
-over humanist sans, monochrome-plus-one, real dark mode, code-as-slab) and the interaction craft
-(animated SVG flows, tweakable sims, mock terminals, before/after toggles — all vanilla, no
-libraries) live in [ARTIFACT.md](ARTIFACT.md).
+Each post is a self-contained file — email it and it just opens, offline. The look (clean
+system-sans, neutral surfaces, real contrast, dark mode) and the visual craft (animated SVG flows,
+tweakable widgets, before/after — vanilla, plus a small pinned-and-SRI'd CDN allow-list for
+animation and the shadcn aesthetic) live in [ARTIFACT.md](ARTIFACT.md).
 ```
 
