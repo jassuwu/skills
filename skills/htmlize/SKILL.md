@@ -28,6 +28,8 @@ A substantial reply — plan, spec, code review, PR writeup, architecture overvi
 
 Each artifact must set three `<head>` tags — `<title>`, `<meta name=description>` (one-line summary), and `<meta name=htmlize-type>` (one of: plan, review, spec, explainer, comparison, research, runbook, design, note) — because the index is a **reading list** built from them. Then build it per [ARTIFACT.md](ARTIFACT.md): a clear, readable, self-contained post that uses a visual only where it genuinely helps the reader understand — not a Markdown dump in a `<body>`.
 
+Posts from one conversation form a trail. Optionally tag a post with `<meta name=htmlize-conversation content="…">` (the thread's title) to group it, and — on a post that continues an earlier one — `<meta name=htmlize-link content="…">`: one plain phrase for *why the work moved here* from the post before it. Omit the link when there's no honest connection; never manufacture filler. The reading list and an injected in-page prev/next render the trail from these.
+
 A trivial reply — a quick fact, a clarifying question, a status line, a confirmation — goes in the terminal as usual. Don't wrap one sentence in a web page.
 
 ## Notes

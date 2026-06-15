@@ -14,6 +14,15 @@ The reading list is built from these — always set all three.
 <meta name=htmlize-type content="plan">   <!-- plan|review|spec|explainer|comparison|research|runbook|design|note -->
 ```
 
+Optional, to thread posts into a conversation trail — the server renders prev/next + the connection from these:
+
+```html
+<meta name=htmlize-conversation content="Auth rework">   <!-- the thread this belongs to -->
+<meta name=htmlize-link content="a stored token raised a revocation question, so next: rotation">
+```
+
+`htmlize-link` is the **inbound** phrase — *why the work moved here* from the previous post. Omit it on the first post and whenever there's no honest hop; a forced "next we…" is filler, same bar as a decorative visual.
+
 ## Principles
 
 1. **Understanding first.** Every element earns its place by making the idea clearer. If deleting it loses no understanding, delete it.

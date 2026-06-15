@@ -75,14 +75,16 @@ def meta_of(fp, name):
     title = html.unescape(tm.group(1).strip()) if tm and tm.group(1).strip() else name
     summary = _meta(head, "description")
     kind = _meta(head, "htmlize-type").lower()
+    conversation = _meta(head, "htmlize-conversation")
+    link = _meta(head, "htmlize-link")
     words = len(TAGS.sub(" ", raw).split())
     mins = max(1, round(words / 220)) if words else 1
     try:
         mtime = os.stat(fp).st_mtime
     except OSError:
         mtime = 0
-    return {"name": name, "title": title, "summary": summary,
-            "kind": kind, "mins": mins, "mtime": mtime}
+    return {"name": name, "title": title, "summary": summary, "kind": kind,
+            "conversation": conversation, "link": link, "mins": mins, "mtime": mtime}
 
 
 def ago(ts, now):
@@ -143,9 +145,11 @@ def chip(kind):
 def row(m, now, pinned=False, trash=False):
     name = m["name"]
     href = "./" + urllib.parse.quote(name)
-    search = html.escape((m["title"] + " " + m["summary"] + " " + m["kind"]).lower(), quote=True)
+    search = html.escape((m["title"] + " " + m["summary"] + " " + m.get("conversation", "") + " " + m["kind"]).lower(), quote=True)
     summary = ('<p class="r-sum">%s</p>' % html.escape(m["summary"])) if m["summary"] else ""
     meta = '<span class="r-meta">%s min&#8202;&middot;&#8202;%s</span>' % (m["mins"], ago(m["mtime"], now))
+    conv = ('<span class="conv">%s</span>' % html.escape(m["conversation"])) if m.get("conversation") else ""
+    link = ('<p class="r-link">&#8627; %s</p>' % html.escape(m["link"])) if m.get("link") else ""
     if trash:
         acts = ('<div class="acts">'
                 '<button class="ic" data-act="restore" title="Restore">&#8617;</button>'
@@ -160,10 +164,10 @@ def row(m, now, pinned=False, trash=False):
     return ('<li class="row%s" draggable="true" data-name="%s" data-search="%s">'
             '<span class="grip" aria-hidden="true">&#8942;&#8942;</span>'
             '<a class="open" href="%s">'
-            '<span class="r-head"><span class="r-title">%s</span>%s</span>'
-            '%s%s</a>%s</li>'
+            '<span class="r-head"><span class="r-title">%s</span>%s%s</span>'
+            '%s%s%s</a>%s</li>'
             % (" pinned" if pinned else "", html.escape(name, True), search, href,
-               html.escape(m["title"]), chip(m["kind"]), summary, meta, acts))
+               html.escape(m["title"]), chip(m["kind"]), conv, summary, meta, link, acts))
 
 
 def ordered(metas, st):
@@ -275,6 +279,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font:1.0625rem/1.7 var(--sans
 .r-sum{margin:.2rem 0 0;font-size:.9375rem;line-height:1.55;color:var(--muted);
  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
 .r-meta{display:block;margin-top:.4rem;font:.8125rem/1.4 var(--mono);color:var(--muted)}
+.conv{font:.7rem/1.3 var(--mono);color:var(--muted);white-space:nowrap;opacity:.8}
+.r-link{margin:.5rem 0 0;font-size:.85rem;line-height:1.5;color:var(--muted);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .acts{flex:0 0 auto;display:flex;gap:.15rem;align-self:center;opacity:0;transition:opacity .14s}
 .row:hover .acts,.row:focus-within .acts{opacity:1}
 .ic{border:none;background:none;cursor:pointer;color:var(--muted);font:1rem/1 var(--sans);
@@ -464,6 +470,62 @@ def safe_name(name):
     return None
 
 
+TRAIL_CSS = (
+    "<style>#__hztrail{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99998;"
+    "max-width:calc(100vw - 1.5rem);display:flex;flex-direction:column;gap:4px;align-items:center;"
+    "background:var(--surface,#fff);border:1px solid var(--border,#e4e4e7);border-radius:12px;"
+    "box-shadow:0 4px 18px rgba(0,0,0,.12);padding:8px 14px;opacity:.5;transition:opacity .15s;"
+    "font:600 12px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace}"
+    "#__hztrail:hover,#__hztrail:focus-within{opacity:1}"
+    "#__hztrail .trow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}"
+    "#__hztrail a{color:var(--accent-text,#3730a3);text-decoration:none;max-width:24ch;overflow:hidden;"
+    "text-overflow:ellipsis;white-space:nowrap}#__hztrail a:hover{text-decoration:underline}"
+    "#__hztrail .pos{color:var(--muted,#52525b);white-space:nowrap;display:inline-flex;align-items:center;gap:8px}"
+    "#__hztrail .dots{display:inline-flex;gap:4px}#__hztrail .dots i{width:6px;height:6px;border-radius:50%;"
+    "background:var(--border-2,#d4d4d8)}#__hztrail .dots i.on{background:var(--accent,#4338ca)}"
+    "#__hztrail .why{color:var(--muted,#52525b);font-weight:400;max-width:64ch;text-align:center;"
+    "overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media print{#__hztrail{display:none}}</style>"
+)
+
+
+def thread_of(name):
+    """(conversation, [metas sorted by name], index of `name`), or None — the conversation `name` belongs to."""
+    conv = meta_of(os.path.join(D, name), name).get("conversation")
+    if not conv:
+        return None
+    mates = sorted((meta_of(os.path.join(D, n), n) for n in artifacts()
+                    if meta_of(os.path.join(D, n), n).get("conversation") == conv),
+                   key=lambda m: m["name"])
+    idx = next((i for i, m in enumerate(mates) if m["name"] == name), -1)
+    return (conv, mates, idx) if len(mates) >= 2 and idx >= 0 else None
+
+
+def thread_footer(name):
+    """Injected in-page prev/next trail bar for a post in a multi-post conversation; '' otherwise."""
+    th = thread_of(name)
+    if not th:
+        return ""
+    conv, mates, idx = th
+    def href(m):
+        return "./" + urllib.parse.quote(m["name"])
+    prev = mates[idx - 1] if idx else None
+    nxt = mates[idx + 1] if idx < len(mates) - 1 else None
+    L = ('<a class=p href="%s">&lsaquo;&#8201;%s</a>' % (href(prev), html.escape(prev["title"]))) if prev else "<span></span>"
+    R = ('<a class=n href="%s">%s&#8201;&rsaquo;</a>' % (href(nxt), html.escape(nxt["title"]))) if nxt else "<span></span>"
+    dots = "".join('<i class=on></i>' if i == idx else "<i></i>" for i in range(len(mates)))
+    why = ('<div class=why>&#8627; %s</div>' % html.escape(nxt["link"])) if (nxt and nxt.get("link")) else ""
+    pos = ('<span class=pos><span class=dots>%s</span>%d of %d &middot; %s</span>'
+           % (dots, idx + 1, len(mates), html.escape(conv)))
+    nav = "<nav id=__hztrail><div class=trow>" + L + pos + R + "</div>" + why + "</nav>"
+    pj = json.dumps(href(prev) if prev else None).replace("<", "\\u003c")
+    nj = json.dumps(href(nxt) if nxt else None).replace("<", "\\u003c")
+    script = ("<script>(function(){var P=" + pj + ",N=" + nj + ";"
+              "addEventListener('keydown',function(e){var t=e.target;"
+              "if(t&&t.matches&&t.matches('input,textarea,[contenteditable]'))return;"
+              "if(e.key==='ArrowLeft'&&P)location.href=P;if(e.key==='ArrowRight'&&N)location.href=N;});})();</script>")
+    return nav + TRAIL_CSS + script
+
+
 class H(http.server.BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -534,7 +596,8 @@ class H(http.server.BaseHTTPRequestHandler):
             t = open(fp, "rb").read().decode("utf-8", "replace")
         except OSError:
             return self.send(404, b"not found", "text/plain")
-        t = t.replace("</body>", SNIP + "</body>", 1) if "</body>" in t else t + SNIP
+        inject = SNIP + thread_footer(os.path.basename(fp))
+        t = t.replace("</body>", inject + "</body>", 1) if "</body>" in t else t + inject
         self.send(200, t.encode("utf-8"), "text/html; charset=utf-8")
 
     def static(self, fp):
