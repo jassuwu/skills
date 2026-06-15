@@ -129,6 +129,8 @@ The techniques worth keeping:
 
 `var()` does **not** resolve in SVG *presentation attributes* (`fill="var(--x)"`, `stroke=`, `font-family=`) — they fall back to black/default. Style SVG only through CSS: a `<style>` block **inside** the `<svg>` (page custom properties cascade in), or `style="fill:var(--x)"` on elements. Give every diagram `<svg>` an explicit `style="width:100%;height:auto"` — a bare `viewBox` renders tiny and off-center.
 
+**Self-closing (the #2 break):** a self-closing `/>` glued to an *unquoted* value silently corrupts it — `<rect … rx=9/>` parses as `rx="9/"` and the element doesn't even close. Quote any value that touches the slash (`rx="9"/>`) or put a space before it (`rx=9 />`). Quoted-then-slash and spaced-then-slash are both safe; unquoted-then-slash is not.
+
 ### Worked example — animated entity-flow (vanilla, no library)
 
 ```html
@@ -140,10 +142,10 @@ The techniques worth keeping:
    #flow .tok{fill:var(--d-green)}
   </style>
   <path class=edge id=e0 d="M150,55 H290"/><path class=edge id=e1 d="M430,55 H570"/>
-  <g><rect class=node x=30 y=33 width=120 height=44 rx=8/><text x=90 y=60 text-anchor=middle>User</text></g>
-  <g><rect class=node x=290 y=33 width=140 height=44 rx=8/><text x=360 y=60 text-anchor=middle>Provider</text></g>
-  <g><rect class=node x=570 y=33 width=120 height=44 rx=8/><text x=630 y=60 text-anchor=middle>Ledger</text></g>
-  <circle class=tok id=tok cx=150 cy=55 r=7/>
+  <g><rect class=node x=30 y=33 width=120 height=44 rx="8"/><text x=90 y=60 text-anchor=middle>User</text></g>
+  <g><rect class=node x=290 y=33 width=140 height=44 rx="8"/><text x=360 y=60 text-anchor=middle>Provider</text></g>
+  <g><rect class=node x=570 y=33 width=120 height=44 rx="8"/><text x=630 y=60 text-anchor=middle>Ledger</text></g>
+  <circle class=tok id=tok cx=150 cy=55 r="7"/>
   <text class=lbl id=bal x=90 y=110 text-anchor=middle>spendable $50.00</text>
  </svg>
  <div class=controls><button class=btn id=step>Step ▸</button><button class=btn id=reset>Reset</button><span class=readout id=say></span></div>
@@ -202,7 +204,7 @@ Default is still **hand-built SVG + vanilla JS** — most posts need no library.
 - **No cryptic/editorial headings or slogan hooks.** Headings name the topic; sentence one states the problem.
 - **No serif-display "magazine" styling, no dark dramatic hero, no Inter/Geist + indigo-gradient.** Clean system-sans, light default, calm column.
 - **No decorative or stacked visuals; no "Loading demo…" placeholders.** One visual per idea, only if it teaches.
-- **No `var()` in SVG presentation attributes; no bare-viewBox SVG.** Style via `<style>`/`style=`, set `width:100%`.
+- **No `var()` in SVG presentation attributes; no bare-viewBox SVG; no unquoted value glued to `/>`.** Style via `<style>`/`style=`, set `width:100%`, and quote (or space) before a self-closing slash.
 - **No low-contrast text, no color-only encoding, no unpausable motion.** Verify both themes; reduced-motion ships the still state.
 - **No floating/unpinned CDN URLs, no untrusted hosts, no missing SRI.**
 - **A trivial reply stays in the terminal** — don't wrap one sentence in a web page.
