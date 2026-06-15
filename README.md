@@ -40,6 +40,7 @@ installs via [skills.sh](https://skills.sh) — works with Claude Code, Cursor, 
 | skill | what it teaches the agent |
 |---|---|
 | [`htmlize`](./skills/htmlize) | render substantial replies — plans, reviews, specs, explainers — as polished, self-contained HTML in a live browser tab that updates in place, instead of walls of terminal Markdown. needs `python3` and a browser. `/htmlize on` to start, `/htmlize off` to stop, bare `/htmlize` to toggle |
+| [`reelize`](./skills/reelize) | make a short video where the music is composed in code and locked to the motion — Strudel (live-coding music) rendered to audio headlessly in Node, Remotion (React) for frame-perfect visuals, muxed into one MP4. encodes the taste to make reels that feel composed, not "a div with a beep." needs `node` 18+; the first video render fetches a headless chromium |
 
 ## anatomy
 

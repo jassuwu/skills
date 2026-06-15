@@ -1,6 +1,7 @@
 {
   "name": "jassuwu-skills",
   "skills": [
-    "./skills/htmlize"
+    "./skills/htmlize",
+    "./skills/reelize"
   ]
 }
